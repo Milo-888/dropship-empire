@@ -1,0 +1,132 @@
+================================================================
+RAILWAY ENVIRONMENT VARIABLES FOR ALL SERVICES
+================================================================
+
+Copy-paste these into Railway Dashboard > Service > Variables tab
+
+================================================================
+1. VIDEO-FACTORY SERVICE
+================================================================
+
+OPENAI_API_KEY=<your-openai-api-key>
+OPENAI_BASE_URL=https://api.openai.com/v1
+MOONSHOT_API_KEY=<your-moonshot-key-if-using>
+PEXELS_API_KEY=<your-pexels-api-key>
+IMAGEMAGICK_BINARY=/usr/bin/convert
+PORT=8080
+HOST=0.0.0.0
+
+================================================================
+2. STORE-PLATFORM SERVICE
+================================================================
+
+APP_NAME=Dropshipping Store
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}
+APP_KEY=<generate-with-php-artisan-key:generate>
+
+DB_CONNECTION=pgsql
+DB_HOST=${{Postgres.PGHOST}}
+DB_PORT=${{Postgres.PGPORT}}
+DB_DATABASE=${{Postgres.PGDATABASE}}
+DB_USERNAME=${{Postgres.PGUSER}}
+DB_PASSWORD=${{Postgres.PGPASSWORD}}
+
+REDIS_HOST=${{Redis.REDIS_HOST}}
+REDIS_PORT=${{Redis.REDIS_PORT}}
+REDIS_PASSWORD=${{Redis.REDIS_PASSWORD}}
+
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=<your-email>
+MAIL_PASSWORD=<your-app-password>
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@yourstore.com
+MAIL_FROM_NAME=Dropshipping Store
+
+================================================================
+3. MARKETING-SUITE SERVICE
+================================================================
+
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+REDIS_URL=${{Redis.REDIS_URL}}
+
+# Email Provider (choose one)
+# For SendGrid:
+SENDGRID_API_KEY=<your-sendgrid-key>
+
+# For Mailgun:
+MAILGUN_API_KEY=<your-mailgun-key>
+MAILGUN_DOMAIN=<your-domain>
+
+# For AWS SES:
+AWS_ACCESS_KEY_ID=<your-aws-key>
+AWS_SECRET_ACCESS_KEY=<your-aws-secret>
+AWS_REGION=us-east-1
+
+JWT_SECRET=<generate-random-secret>
+JWT_EXPIRES_IN=7d
+
+================================================================
+4. RESEARCH-BOT SERVICE
+================================================================
+
+PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+PORT=8090
+HEADLESS=true
+TIMEOUT=30000
+
+================================================================
+5. N8N SERVICE
+================================================================
+
+N8N_HOST=${{RAILWAY_PUBLIC_DOMAIN}}
+N8N_PROTOCOL=https
+N8N_PORT=5678
+
+DB_TYPE=postgresdb
+DB_POSTGRESDB_HOST=${{Postgres.PGHOST}}
+DB_POSTGRESDB_PORT=${{Postgres.PGPORT}}
+DB_POSTGRESDB_DATABASE=${{Postgres.PGDATABASE}}
+DB_POSTGRESDB_USER=${{Postgres.PGUSER}}
+DB_POSTGRESDB_PASSWORD=${{Postgres.PGPASSWORD}}
+
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_BASIC_AUTH_USER=admin
+N8N_BASIC_AUTH_PASSWORD=<create-secure-password>
+
+GENERIC_TIMEZONE=America/New_York
+WEBHOOK_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}
+EXECUTIONS_PROCESS=main
+EXECUTIONS_TIMEOUT=300
+EXECUTIONS_TIMEOUT_MAX=3600
+
+================================================================
+NOTES:
+================================================================
+
+1. Replace <your-*> values with actual credentials
+2. ${{Service.VARIABLE}} syntax automatically references other services
+3. Generate APP_KEY for store-platform after first deployment:
+   railway run --service store-platform php artisan key:generate --show
+4. For security, use strong passwords (16+ characters)
+5. Store sensitive keys in Railway's encrypted variables
+
+================================================================
+AFTER ADDING VARIABLES:
+================================================================
+
+1. Save variables
+2. Redeploy the service (Railway auto-redeploys on variable changes)
+3. Check deployment logs for any errors
+4. Test the service endpoint
+
+================================================================
