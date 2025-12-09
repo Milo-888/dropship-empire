@@ -4,22 +4,22 @@
 [[services]]
 name = "video-factory"
 root = "video-factory"
-dockerfile = "video-factory/Dockerfile"
+dockerfile = "Dockerfile"
 
 [[services]]
 name = "research-bot"
 root = "research-bot"
-dockerfile = "research-bot/Dockerfile"
+dockerfile = "Dockerfile"
 
 [[services]]
 name = "n8n"
 root = "n8n-service"
-dockerfile = "n8n-service/Dockerfile"
+dockerfile = "Dockerfile"
 
 [[services]]
 name = "marketing-suite"
 root = "marketing-suite/apps/platform"
-dockerfile = "marketing-suite/apps/platform/Dockerfile"
+dockerfile = "Dockerfile"
 
 [[services]]
 name = "store-platform"
