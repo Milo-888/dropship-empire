@@ -18,6 +18,7 @@ Your repository is ready! Here's what you need to do:
 - **store-platform**: 2,624 files - PHP/Bagisto e-commerce platform
 - **marketing-suite**: 628 files - Node.js/TypeScript email marketing
 - **research-bot**: 417 files - Python/Playwright web scraping
+- **n8n-service**: Custom Dockerfile for n8n workflow automation
 
 ### Documentation
 - `README.md` - Project overview

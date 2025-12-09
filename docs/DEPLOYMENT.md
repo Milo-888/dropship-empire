@@ -124,24 +124,41 @@ REDIS_URL=${{Redis.REDIS_URL}}
 ### Step 3: Deploy n8n
 
 1. Click **+ New** in Railway Dashboard
-2. Click **Database** → Search for "n8n"
-3. Select **n8n** template
-4. Configure:
-   - **N8N_HOST**: Use Railway generated domain
-   - **N8N_PROTOCOL**: https
-   - **N8N_PORT**: 5678
-   - **DB_TYPE**: postgresdb
-   - **DB_POSTGRESDB_HOST**: `${{Postgres.PGHOST}}`
-   - **DB_POSTGRESDB_PORT**: `${{Postgres.PGPORT}}`
-   - **DB_POSTGRESDB_DATABASE**: `${{Postgres.PGDATABASE}}`
-   - **DB_POSTGRESDB_USER**: `${{Postgres.PGUSER}}`
-   - **DB_POSTGRESDB_PASSWORD**: `${{Postgres.PGPASSWORD}}`
-   - **GENERIC_TIMEZONE**: America/New_York
-   - **N8N_BASIC_AUTH_ACTIVE**: true
-   - **N8N_BASIC_AUTH_USER**: admin
-   - **N8N_BASIC_AUTH_PASSWORD**: <secure-password>
+2. Select **Empty Service**
+3. Name it: `n8n`
+4. Click **Settings** tab
+5. Connect to your GitHub repository
+6. Set **Root Directory**: `n8n-service`
+7. Railway will auto-detect the Dockerfile
 
-5. Click **Deploy**
+**Environment Variables**:
+```bash
+# Host Configuration
+N8N_HOST=${{RAILWAY_PUBLIC_DOMAIN}}
+N8N_PROTOCOL=https
+N8N_PORT=5678
+
+# Database (Reference existing PostgreSQL)
+DB_TYPE=postgresdb
+DB_POSTGRESDB_HOST=${{Postgres.PGHOST}}
+DB_POSTGRESDB_PORT=${{Postgres.PGPORT}}
+DB_POSTGRESDB_DATABASE=${{Postgres.PGDATABASE}}
+DB_POSTGRESDB_USER=${{Postgres.PGUSER}}
+DB_POSTGRESDB_PASSWORD=${{Postgres.PGPASSWORD}}
+
+# Authentication
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_BASIC_AUTH_USER=admin
+N8N_BASIC_AUTH_PASSWORD=<your-secure-password>
+
+# Timezone
+GENERIC_TIMEZONE=America/New_York
+
+# Webhook
+WEBHOOK_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}
+```
+
+8. Click **Deploy**
 
 ### Step 4: Deploy research-bot
 

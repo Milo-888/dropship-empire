@@ -34,6 +34,7 @@ For each service:
    - `store-platform`
    - `marketing-suite/apps/platform`
    - `research-bot`
+   - `n8n-service`
 
 **Done!** Auto-deployment is now active.
 

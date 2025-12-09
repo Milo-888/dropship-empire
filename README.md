@@ -90,7 +90,7 @@ This platform integrates multiple specialized services to create a complete drop
   - Review extraction
 
 ### 5. n8n Workflow Engine
-- **Technology**: Node.js
+- **Technology**: Node.js (Docker)
 - **Purpose**: Connect and automate all services
 - **Features**:
   - Visual workflow builder
@@ -98,6 +98,7 @@ This platform integrates multiple specialized services to create a complete drop
   - Scheduled tasks
   - Webhooks
 - **Port**: 5678
+- **Deployment**: Custom Dockerfile using official n8n image
 
 ## 🚀 Quick Start
 
