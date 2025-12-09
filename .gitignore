@@ -1,0 +1,73 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Temporary deployment documents
+tmp_rovodev_*
+*_START_HERE_*.txt
+START_HERE_*.txt
+ACTION_PLAN.md
+AUTHENTICATION_FIXED.md
+COMPLETE_IMPLEMENTATION_REPORT.md
+DEPLOYMENT_COMPLETE.md
+DEPLOYMENT_REPORT.md
+DEPLOY_STORE_NOW.md
+FINAL_STATUS_REPORT.md
+QUICK_DEPLOY_COMMANDS.md
+RAILWAY_DASHBOARD_GUIDE.md
+RAILWAY_DEPLOYMENT_COMPLETE.md
+RAILWAY_DEPLOYMENT_COMPLETE_SETUP.md
+RAILWAY_DEPLOYMENT_GUIDE.md
+RAILWAY_QUICK_START.md
+README_DEPLOYMENT.md
+WORKFLOW_GUIDE.md
+
+# Test results
+test_results/
+
+# Reference/Example folder (UiPath - not needed for deployment)
+Dropshipping-Price-Sentiment-Analysis-ToolNote-Asdiscussed-use-this-only-to-understand-/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies (managed by package managers)
+node_modules/
+vendor/
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Cache
+.cache/
+.npm/
+.eslintcache
+*.tsbuildinfo
+
+# Storage and generated content
+storage/
+data_shared/

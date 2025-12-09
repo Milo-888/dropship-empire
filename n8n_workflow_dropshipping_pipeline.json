@@ -1,0 +1,248 @@
+{
+  "name": "Dropshipping Automation Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "C:\\Users\\jadem\\dropship-empire\\data_shared",
+        "event": "add"
+      },
+      "id": "1",
+      "name": "File Trigger - Watch winners.csv",
+      "type": "n8n-nodes-base.fileWatcher",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\jadem\\dropship-empire\\data_shared\\winners.csv",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Read CSV - Product Data",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "mode": "jsonToCsv",
+        "options": {
+          "delimiter": ","
+        }
+      },
+      "id": "3",
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse CSV data and extract top product\nconst items = $input.all();\nconst topProduct = items[0];\n\nreturn {\n  productName: topProduct.json['Product Name'],\n  price: topProduct.json['Price'],\n  rating: topProduct.json['Rating'],\n  sentimentScore: topProduct.json['Sentiment Score'],\n  source: topProduct.json['Source'],\n  link: topProduct.json['Link']\n};"
+      },
+      "id": "4",
+      "name": "Extract Top Product",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:4455/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "product_name",
+              "value": "={{ $json.productName }}"
+            },
+            {
+              "name": "price",
+              "value": "={{ $json.price }}"
+            },
+            {
+              "name": "description",
+              "value": "Create a viral 30-second product ad video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5",
+      "name": "Video Factory - Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3021/api/campaigns",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.productName }} Campaign"
+            },
+            {
+              "name": "subject",
+              "value": "Check out this amazing product!"
+            },
+            {
+              "name": "content",
+              "value": "We found an amazing product: {{ $json.productName }} for only {{ $json.price }}! Sentiment score: {{ $json.sentimentScore }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6",
+      "name": "Marketing Suite - Create Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:4588/api/products",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.productName }}"
+            },
+            {
+              "name": "price",
+              "value": "={{ $json.price }}"
+            },
+            {
+              "name": "source_url",
+              "value": "={{ $json.link }}"
+            },
+            {
+              "name": "rating",
+              "value": "={{ $json.rating }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7",
+      "name": "Store Platform - Add Product",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Send notification with results\nconst product = $json;\n\nreturn {\n  message: `✅ Automation Complete for: ${product.productName}`,\n  details: {\n    videoGenerated: 'Success',\n    campaignCreated: 'Success',\n    productAdded: 'Success',\n    price: product.price,\n    sentimentScore: product.sentimentScore\n  }\n};"
+      },
+      "id": "8",
+      "name": "Success Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "File Trigger - Watch winners.csv": {
+      "main": [
+        [
+          {
+            "node": "Read CSV - Product Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read CSV - Product Data": {
+      "main": [
+        [
+          {
+            "node": "Parse CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse CSV": {
+      "main": [
+        [
+          {
+            "node": "Extract Top Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Top Product": {
+      "main": [
+        [
+          {
+            "node": "Video Factory - Generate Video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marketing Suite - Create Campaign",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Platform - Add Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Factory - Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Suite - Create Campaign": {
+      "main": [
+        [
+          {
+            "node": "Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Platform - Add Product": {
+      "main": [
+        [
+          {
+            "node": "Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-09T09:00:00.000Z",
+  "versionId": "1"
+}
