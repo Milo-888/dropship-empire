@@ -1,0 +1,26 @@
+# Railway Monorepo Configuration
+# This file tells Railway where each service is located
+
+[[services]]
+name = "video-factory"
+root = "video-factory"
+dockerfile = "video-factory/Dockerfile"
+
+[[services]]
+name = "research-bot"
+root = "research-bot"
+dockerfile = "research-bot/Dockerfile"
+
+[[services]]
+name = "n8n"
+root = "n8n-service"
+dockerfile = "n8n-service/Dockerfile"
+
+[[services]]
+name = "marketing-suite"
+root = "marketing-suite/apps/platform"
+dockerfile = "marketing-suite/apps/platform/Dockerfile"
+
+[[services]]
+name = "store-platform"
+root = "store-platform"
