@@ -1,8 +1,8 @@
 # --------------> The compiler image
 FROM node:18 AS compile
 WORKDIR /usr/src/app/apps/ui
-COPY ./tsconfig.base.json /usr/src/app
-COPY ./apps/ui ./
+COPY tsconfig.base.json /usr/src/app/
+COPY apps/ui ./
 RUN npm ci
 RUN npm run build
 

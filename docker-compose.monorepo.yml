@@ -1,0 +1,268 @@
+services:
+  # Shared Database Services
+  postgres:
+    image: postgres:16-alpine
+    container_name: dropship-postgres
+    environment:
+      POSTGRES_DB: parcelvoy
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dropship-network
+
+  mysql:
+    image: mysql:8.0.36
+    container_name: dropship-mysql
+    platform: linux/x86_64
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: bagisto
+      MYSQL_USER: bagisto
+      MYSQL_PASSWORD: bagisto_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s
+      timeout: 20s
+      retries: 30
+    networks:
+      - dropship-network
+
+  redis:
+    image: redis:alpine
+    container_name: dropship-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dropship-network
+
+  # Marketing Suite Services
+  marketing-api:
+    build:
+      context: ./marketing-suite
+      dockerfile: apps/platform/Dockerfile
+    container_name: dropship-marketing-api
+    environment:
+      NODE_ENV: production
+      BASE_URL: http://localhost:3030
+      RUNNER: api
+      APP_SECRET: change-this-secret-key-in-production
+      PORT: 3001
+      DB_CLIENT: postgres
+      DB_HOST: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres_password
+      DB_PORT: 5432
+      DB_DATABASE: parcelvoy
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      AUTH_DRIVER: basic
+      AUTH_BASIC_EMAIL: admin@example.com
+      AUTH_BASIC_PASSWORD: admin123
+      AUTH_BASIC_NAME: Admin
+    ports:
+      - "3030:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dropship-network
+
+  marketing-worker:
+    build:
+      context: ./marketing-suite
+      dockerfile: apps/platform/Dockerfile
+    container_name: dropship-marketing-worker
+    environment:
+      NODE_ENV: production
+      BASE_URL: http://localhost:3030
+      RUNNER: worker
+      APP_SECRET: change-this-secret-key-in-production
+      DB_CLIENT: postgres
+      DB_HOST: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres_password
+      DB_PORT: 5432
+      DB_DATABASE: parcelvoy
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      marketing-api:
+        condition: service_healthy
+    networks:
+      - dropship-network
+
+  marketing-ui:
+    build:
+      context: ./marketing-suite
+      dockerfile: apps/ui/Dockerfile
+    container_name: dropship-marketing-ui
+    environment:
+      API_BASE_URL: http://localhost:3030
+    ports:
+      - "3031:3000"
+    depends_on:
+      - marketing-api
+    networks:
+      - dropship-network
+
+  # n8n Workflow Service
+  n8n:
+    build:
+      context: ./n8n-service
+      dockerfile: Dockerfile
+    container_name: dropship-n8n
+    environment:
+      N8N_HOST: localhost
+      N8N_PROTOCOL: http
+      N8N_PORT: 5678
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: postgres
+      DB_POSTGRESDB_PASSWORD: postgres_password
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: admin
+      N8N_BASIC_AUTH_PASSWORD: admin123
+      GENERIC_TIMEZONE: America/New_York
+      WEBHOOK_URL: http://localhost:5679
+    ports:
+      - "5679:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dropship-network
+
+  # Video Factory Service
+  video-factory-api:
+    build:
+      context: ./video-factory
+      dockerfile: Dockerfile
+    container_name: dropship-video-api
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./video-factory:/MoneyPrinterTurbo
+      - video_output:/MoneyPrinterTurbo/storage
+    command: ["python3", "main.py"]
+    networks:
+      - dropship-network
+
+  video-factory-webui:
+    build:
+      context: ./video-factory
+      dockerfile: Dockerfile
+    container_name: dropship-video-webui
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8502:8501"
+    volumes:
+      - ./video-factory:/MoneyPrinterTurbo
+      - video_output:/MoneyPrinterTurbo/storage
+    command: ["streamlit", "run", "./webui/Main.py", "--browser.serverAddress=0.0.0.0", "--server.enableCORS=True", "--browser.gatherUsageStats=False"]
+    networks:
+      - dropship-network
+
+  # Research Bot Service
+  research-bot:
+    build:
+      context: ./research-bot
+      dockerfile: Dockerfile
+    container_name: dropship-research-bot
+    environment:
+      - PYTHONUNBUFFERED=1
+      - GEMINI_API_KEY=AIzaSyDQ7BPJQ3RoSthiVht_4O-_EOs-O_PVHPE
+    volumes:
+      - ./research-bot:/app
+    networks:
+      - dropship-network
+
+  # Store Platform Service (Bagisto)
+  store-platform:
+    image: php:8.3-apache
+    container_name: dropship-store
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: bagisto
+      DB_USERNAME: bagisto
+      DB_PASSWORD: bagisto_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      APACHE_DOCUMENT_ROOT: /var/www/html/public
+    ports:
+      - "8083:80"
+    volumes:
+      - ./store-platform:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      bash -c "
+      apt-get update &&
+      apt-get install -y libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libicu-dev libxml2-dev git unzip &&
+      docker-php-ext-configure gd --with-freetype --with-jpeg &&
+      docker-php-ext-install pdo pdo_mysql mysqli gd zip intl bcmath soap &&
+      a2enmod rewrite &&
+      sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf &&
+      echo '<Directory /var/www/html/public>' >> /etc/apache2/sites-available/000-default.conf &&
+      echo '    AllowOverride All' >> /etc/apache2/sites-available/000-default.conf &&
+      echo '    Require all granted' >> /etc/apache2/sites-available/000-default.conf &&
+      echo '</Directory>' >> /etc/apache2/sites-available/000-default.conf &&
+      apache2-foreground
+      "
+    networks:
+      - dropship-network
+
+networks:
+  dropship-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  n8n_data:
+    driver: local
+  video_output:
+    driver: local

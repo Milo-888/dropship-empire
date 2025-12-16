@@ -1,10 +1,11 @@
 # --------------> The compiler image
 FROM node:18 AS compile
 WORKDIR /usr/src/app
-COPY package*.json ./
-COPY tsconfig.json ./
+COPY apps/platform/package*.json ./
+COPY apps/platform/tsconfig*.json ./
+COPY tsconfig.base.json ./
 RUN npm ci
-COPY . ./
+COPY apps/platform ./
 RUN npm run build
 
 # --------------> The build image

@@ -1,0 +1,46 @@
+Dropshipping Platform - Deployment Summary
+===========================================
+Date: December 15, 2025
+
+DEPLOYMENT STATUS:
+✅ Database Services Started
+   - PostgreSQL (Port 5432) - RUNNING & HEALTHY
+   - MySQL (Port 3307) - RUNNING & HEALTHY
+   - Redis (Port 6380) - RUNNING & HEALTHY
+
+✅ n8n Workflow Service - RUNNING
+   - Port 5679
+   - URL: http://localhost:5679
+   - Credentials: admin / admin123
+
+⏳ Application Services (Building)
+   - Video Factory API (Port 8082)
+   - Video Factory WebUI (Port 8502)
+   - Research Bot
+   - Marketing Suite API (Port 3030)
+   - Marketing Suite UI (Port 3031)
+   - Store Platform (Port 8083)
+
+DOCKER CONFIGURATION:
+- Monorepo setup: docker-compose.monorepo.yml
+- Network: dropship-network
+- Volumes: postgres_data, mysql_data, redis_data, n8n_data
+
+NEXT STEPS:
+1. Wait for application service builds to complete (5-10 minutes)
+2. Run: docker-compose -f docker-compose.monorepo.yml ps
+3. Access services via the URLs above
+4. Import n8n workflow from: n8n_workflow_dropshipping_pipeline.json
+
+USEFUL COMMANDS:
+- Check status: .\check-deployment-status.ps1
+- View logs: docker-compose -f docker-compose.monorepo.yml logs -f [service-name]
+- Restart service: docker-compose -f docker-compose.monorepo.yml restart [service-name]
+- Stop all: docker-compose -f docker-compose.monorepo.yml down
+- Start all: docker-compose -f docker-compose.monorepo.yml up -d
+
+NOTES:
+- Video Factory and Research Bot services are still building (large images)
+- Marketing Suite requires additional build time for Node.js compilation
+- Store Platform needs PHP dependencies installation
+- All services use non-conflicting ports to avoid collisions

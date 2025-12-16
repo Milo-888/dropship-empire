@@ -1,25 +1,16 @@
-FROM python:3.11-slim
+FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies
-RUN pip install --no-cache-dir playwright google-generativeai
-
-# Install Playwright browsers
-RUN playwright install --with-deps chromium
-
-# Set working directory
 WORKDIR /app
 
-# Copy scraper script
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy only necessary files (not the playwright source directory)
 COPY scraper.py .
 
-# Environment variables will be passed at runtime
+# Set environment variable
 ENV PYTHONUNBUFFERED=1
 
-# Run the scraper
-CMD ["python", "scraper.py"]
+# Keep container running - scraper will be run on demand
+CMD ["tail", "-f", "/dev/null"]

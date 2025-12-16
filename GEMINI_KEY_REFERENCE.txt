@@ -1,0 +1,33 @@
+﻿# GEMINI API KEY - QUICK REFERENCE
+
+**Updated:** December 15, 2025
+**API Key:** AIzaSyDQ7BPJQ3RoSthiVht_4O-_EOs-O_PVHPE
+
+## Services Using Gemini
+
+### 1. Video Factory (config.toml)
+- Location: video-factory/config.toml
+- Provider: gemini
+- Model: gemini-1.0-pro
+- Status: WebUI Working (http://localhost:8502)
+
+### 2. Research Bot (environment variable)
+- Environment: GEMINI_API_KEY
+- Model: gemini-2.0-flash-exp (hardcoded)
+- Status: Container running
+
+## Test Commands
+
+`powershell
+# Test Video Factory WebUI
+Start-Process "http://localhost:8502"
+
+# Check Research Bot environment
+docker exec dropship-research-bot printenv | Select-String "GEMINI"
+
+# Restart services if needed
+docker-compose -f docker-compose.monorepo.yml restart video-factory-webui research-bot
+`
+
+## Documentation
+See GEMINI_API_KEY_UPDATE.md for full details.
